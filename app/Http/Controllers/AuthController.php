@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['login']]);
+    }
+
     public function login(Request $request)
     {
         /*Imprimir campo especifico dos dodos de entrada
@@ -13,7 +20,6 @@ class AuthController extends Controller
             *dd($request->all(['email']));*
         */
 
-        
         try {
             /*
             Estou realizando uma validação pelo email e senha.
@@ -45,7 +51,7 @@ class AuthController extends Controller
 
             Nesse exemplo vou retornar um
         */
-        return response()->json(['token' => $token], 201);
+        return $this->respondWithToken($token);
     }
 
     public function logout()
@@ -61,5 +67,14 @@ class AuthController extends Controller
     public function me()
     {
         return 'me';
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ], 201);
     }
 }
