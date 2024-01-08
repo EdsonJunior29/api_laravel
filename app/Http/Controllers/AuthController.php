@@ -62,7 +62,11 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return 'refresh';
+        $tokenRefresh = auth('api')->refresh();
+        
+        return response()->json([
+            'token' =>  $tokenRefresh
+        ], 200);
     }
 
     public function me()
